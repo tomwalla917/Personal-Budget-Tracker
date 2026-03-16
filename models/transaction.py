@@ -46,7 +46,7 @@ class Transaction:
         # TODO: Implement save method
         # If self.id exists, UPDATE existing transaction
         # If self.id is None, INSERT new transaction
-        
+
         if not self.validate():
             return False
             
@@ -63,6 +63,14 @@ class Transaction:
                 # Write SQL INSERT query with RETURNING id
                 # Use self.db.execute_query() to get the new ID
                 # Set self.id to the returned ID
+                query = """
+                INSERT INTO transactions (amount, description, transaction_date, category_id, type)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id
+                """
+                params = (self.amount, self.description, self.transaction_date, self.category_id, self.type)
+                result = self.db.execute_query(query, params)
+                self.id = result[0][0]
                 pass
                 
         except Exception as e:
@@ -104,8 +112,17 @@ class Transaction:
         # - transaction_date is a valid date
         # - type is 'income' or 'expense'
         # - category_id exists in database (optional check)
+        if self.amount <= 0:
+            return False
+        if self.description is None or self.description.strip() == "":
+            return False
+        if not isinstance(self.transaction_date, date):
+            return False
+        if self.type not in ["income", "expense"]:
+            return False
+        return True
         
-        pass  # Remove when implemented
+
     
     @staticmethod
     def get_all():
