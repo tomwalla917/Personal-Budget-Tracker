@@ -57,7 +57,15 @@ class Transaction:
                 # TODO: UPDATE existing transaction
                 # Write SQL UPDATE query
                 # Use self.db.execute_update() with parameters
-                pass
+                query = """
+                UPDATE transactions 
+                SET amount = %s, description = %s, transaction_date = %s, category_id = %s, type = %s
+                WHERE id = %s
+
+                """
+                params = (self.amount, self.description, self.transaction_date, self.category_id, self.type, self.id)
+                self.db.execute_update(query, params)
+                
             else:
                 # TODO: INSERT new transaction
                 # Write SQL INSERT query with RETURNING id
@@ -71,7 +79,7 @@ class Transaction:
                 params = (self.amount, self.description, self.transaction_date, self.category_id, self.type)
                 result = self.db.execute_query(query, params)
                 self.id = result[0][0]
-                pass
+                
                 
         except Exception as e:
             print(f"❌ Error saving transaction: {e}")
